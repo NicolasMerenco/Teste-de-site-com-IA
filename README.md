@@ -1,4 +1,1 @@
-# Meu-site
-Meu primeiro projeto de site, criado como um teste inicial. Pretendo aprimorar e expandir este site com novos recursos e melhorias ao longo do tempo.
-
-Edit: Na verdade eu fiz esse site com IA, então não pretendo continuar ele. E no momento estou estudando HTML e CSS para de fato criar um site meu de verdade.
+Fiz este site apenas como um teste usando inteligência artificial, então não é algo a se levar em consideração. Não pretendo criar nada nele. Contudo, foi minha primeira experiência em construir e estruturar um site, e pude aprender bastante com isso. A partir daqui, pretendo começar a estudar HTML e CSS para, então, criar um site 100% meu, com tudo o que eu gosto.
