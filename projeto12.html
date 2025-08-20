@@ -1,204 +1,325 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Cosmos - Carl Sagan</title>
-<link rel="shortcut icon" href="imagens/favicon_io2/favicon.ico" type="image/x-icon">
-<style>
-/* Fonte e reset */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    color: #fff;
-    overflow-x: hidden;
-    background: linear-gradient(270deg, #0b0b0b, #1a1a1a, #0b0b0b);
-    background-size: 600% 600%;
-    animation: gradientBG 30s ease infinite;
-}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cosmos — Carl Sagan</title>
+  <link rel="shortcut icon" href="imagens/favicon_io2/favicon.ico" type="image/x-icon">
+  <meta name="description" content="Coleção de episódios — Cosmos. Player responsivo com navegação acessível e fundo com partículas cósmicas.">
+  <style>
+    :root{
+      --bg-1:#07070b;
+      --bg-2:#0f1720;
+      --accent:#00ffcc;
+      --card-bg:rgba(10,12,15,0.6);
+      --glass: rgba(255,255,255,0.03);
+      --text:#FFFFFF;
+      --muted:rgba(255,255,255,0.7);
+      --radius:14px;
+      --max-width:1080px;
+    }
 
-/* Animação do fundo cósmico */
-@keyframes gradientBG {
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
-}
+    /* Reset mínimo */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--bg-1),var(--bg-2));
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
 
-h1 {
-    text-align: center;
-    font-size: 2.8em;
-    margin-bottom: 25px;
-    letter-spacing: 1px;
-    text-shadow: 0 0 20px #00ffcc;
-}
+    /* Skip link para acessibilidade */
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{position:static;width:auto;height:auto;margin:8px;z-index:999;background:#fff;color:#000;padding:8px;border-radius:6px}
 
-/* Player */
-.video-container {
-    width: 90%;
-    max-width: 960px;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 0 50px rgba(0,255,204,0.6);
-    margin-bottom: 25px;
-    position: relative;
-    background: #000;
-    animation: pulseGlow 2s infinite alternate;
-}
+    header{display:flex;align-items:center;gap:16px;padding:22px;justify-content:center}
+    h1{margin:0;font-size:2.4rem;letter-spacing:0.6px;text-align:center;text-shadow:0 0 18px rgba(0,255,204,0.08);}
+    .subtitle{font-size:0.95rem;color:var(--muted);text-align:center;margin-top:6px}
 
-iframe {
-    width: 100%;
-    aspect-ratio: 16/9;
-    border: 0;
-    border-radius: 15px;
-}
+    main{display:flex;flex-direction:column;align-items:center;padding:18px 18px 64px}
 
-/* Glow pulsante */
-@keyframes pulseGlow {
-    0%{box-shadow:0 0 40px rgba(0,255,204,0.5);}
-    100%{box-shadow:0 0 60px rgba(0,255,204,0.9);}
-}
+    /* Canvas de partículas cobre o fundo e fica atrás de todo o conteúdo */
+    #universe{
+      position:fixed;inset:0;z-index:0;pointer-events:none;display:block;opacity:0.95
+    }
 
-/* Controls */
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
-    max-width: 960px;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 40px;
-}
+    .stage{position:relative;z-index:2;width:100%;max-width:var(--max-width);display:flex;flex-direction:column;align-items:center;gap:20px}
 
-select, button {
-    padding: 12px 18px;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+    .card{
+      width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);padding:16px;backdrop-filter:blur(6px);box-shadow:0 8px 40px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03)
+    }
 
-select {
-    background-color: #222;
-    color: #fff;
-    min-width: 200px;
-}
+    /* Video container - responsivo e acessível */
+    .video-container{border-radius:12px;overflow:hidden;background:#000;box-shadow:0 0 60px rgba(0,255,204,0.06)}
+    .player-embed{width:100%;height:0;padding-bottom:56.25%;position:relative}
+    .player-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-select:hover {
-    background-color: #333;
-}
+    .controls-row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+    .controls-left{display:flex;align-items:center;gap:12px}
+    .controls-right{display:flex;align-items:center;gap:8px}
 
-button {
-    background-color: #00ffcc;
-    color: #000;
-    box-shadow: 0 0 20px #00ffcc;
-}
+    select,button{font-size:1rem;padding:10px 14px;border-radius:10px;border:0;background:var(--card-bg);color:var(--text);cursor:pointer}
+    button{background:linear-gradient(90deg,var(--accent) 0%, #00e6b8 100%);color:#001;box-shadow:0 8px 30px rgba(0,255,204,0.08);font-weight:600}
+    button:focus,select:focus{outline:3px solid rgba(0,255,204,0.12)}
 
-button:hover {
-    background-color: #00e6b8;
-    box-shadow: 0 0 35px #00e6b8;
-    transform: translateY(-2px);
-}
+    .label{font-weight:600;margin-right:6px}
 
-.label {
-    margin-right: 10px;
-    font-weight: bold;
-    font-size: 16px;
-}
+    /* Responsividade ampliada (TV / grandes telas) */
+    @media (min-width:1200px){h1{font-size:3.4rem}.player-embed{padding-bottom:56.25%}.stage{gap:26px}}
 
-/* Responsividade */
-@media (max-width:768px){
-    h1 { font-size: 2.2em; }
-    select, button { font-size: 14px; padding: 10px 14px; }
-}
-@media (max-width:480px){
-    h1 { font-size: 1.8em; }
-    .controls { flex-direction: column; gap: 10px; }
-    select, button { width: 100%; }
-}
-</style>
+    @media (max-width:768px){h1{font-size:1.8rem}.controls-row{flex-direction:column;align-items:stretch}.controls-right{justify-content:space-between}}
+
+    /* Acessibilidade visual */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+    /* Mensagens de erro/fallback */
+    .fallback{padding:18px;border-radius:10px;background:rgba(255,255,255,0.03);color:var(--muted);text-align:center}
+
+    /* Prefer reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important;transition:none!important}
+    }
+
+    footer{margin-top:24px;color:var(--muted);font-size:0.9rem;text-align:center}
+  </style>
 </head>
 <body>
-
-<h1>🌌 Cosmos - Carl Sagan</h1>
-
-<div class="video-container">
-    <iframe id="player" 
-        src="https://drive.google.com/file/d/1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU/preview" 
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write" 
-        allowfullscreen loading="lazy"></iframe>
-</div>
-
-<div class="controls">
+  <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+  <canvas id="universe" aria-hidden="true"></canvas>
+  <header role="banner">
     <div>
-        <span class="label">Episódio:</span>
-        <select id="episodes">
-            <option value="1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU">Episódio 1</option>
-            <option value="1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o">Episódio 2</option>
-            <option value="1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t">Episódio 3</option>
-            <option value="1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh">Episódio 4</option>
-            <option value="1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-">Episódio 5</option>
-            <option value="1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1">Episódio 6</option>
-            <option value="1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ">Episódio 7</option>
-            <option value="1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4">Episódio 8</option>
-            <option value="1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv">Episódio 9</option>
-            <option value="1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k">Episódio 10</option>
-            <option value="1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7">Episódio 11</option>
-            <option value="11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB">Episódio 12</option>
-            <option value="1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et">Episódio 13</option>
-        </select>
+      <h1>🌌 Cosmos — Carl Sagan</h1>
+      <div class="subtitle">Coleção de episódios — player acessível e responsivo</div>
     </div>
+  </header>
 
-    <div>
-        <button onclick="prevVideo()">⬅ Anterior</button>
-        <button onclick="restartVideo()">🔄 Reiniciar</button>
-        <button onclick="nextVideo()">Próximo ➡</button>
-        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    </div>
-</div>
+  <main id="main-content" class="stage" role="main">
 
-<script>
-const player = document.getElementById('player');
-const select = document.getElementById('episodes');
+    <section class="card" aria-labelledby="player-title">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column">
+            <h2 id="player-title" style="margin:0;font-size:1.2rem">Assistir Episódios</h2>
+            <div id="player-desc" class="visually-hidden">Selecione um episódio no menu e use as teclas ← → para navegar. Pressione R para reiniciar e F para tela cheia.</div>
+          </div>
 
-function loadEpisode(index){
-    const option = select.options[index];
-    select.selectedIndex = index;
-    player.src = `https://drive.google.com/file/d/${option.value}/preview`;
-}
+          <div style="display:flex;gap:12px;align-items:center">
+            <label for="episodes" class="label" aria-hidden="true">Episódio</label>
+            <select id="episodes" aria-label="Escolha de episódio">
+              <option value="1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU">Episódio 1</option>
+              <option value="1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o">Episódio 2</option>
+              <option value="1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t">Episódio 3</option>
+              <option value="1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh">Episódio 4</option>
+              <option value="1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-">Episódio 5</option>
+              <option value="1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1">Episódio 6</option>
+              <option value="1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ">Episódio 7</option>
+              <option value="1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4">Episódio 8</option>
+              <option value="1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv">Episódio 9</option>
+              <option value="1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k">Episódio 10</option>
+              <option value="1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7">Episódio 11</option>
+              <option value="11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB">Episódio 12</option>
+              <option value="1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et">Episódio 13</option>
+            </select>
+          </div>
+        </div>
 
-// Inicializa episódio 1
-loadEpisode(0);
+        <div class="video-container">
+          <div class="player-embed" id="playerEmbed" role="region" aria-label="Player de vídeo">
+            <iframe id="player" src="about:blank" title="Player de vídeo - Cosmos" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
 
-// Eventos
-select.addEventListener('change', ()=>loadEpisode(select.selectedIndex));
+        <div class="controls-row" role="toolbar" aria-label="Controles do player">
+          <div class="controls-left">
+            <button id="prevBtn" type="button" aria-label="Episódio anterior">⬅ Anterior</button>
+            <button id="restartBtn" type="button" aria-label="Reiniciar episódio">🔄 Reiniciar</button>
+            <button id="nextBtn" type="button" aria-label="Próximo episódio">Próximo ➡</button>
+            <button id="fullscreenBtn" type="button" aria-label="Alternar tela cheia">⛶ Fullscreen</button>
+          </div>
+          <div class="controls-right">
+            <div id="status" aria-live="polite" style="font-size:0.95rem;color:var(--muted)"></div>
+          </div>
+        </div>
 
-function toggleFullscreen(){
-    if(player.requestFullscreen) player.requestFullscreen();
-    else if(player.webkitRequestFullscreen) player.webkitRequestFullscreen();
-    else if(player.msRequestFullscreen) player.msRequestFullscreen();
-}
+        <div class="fallback visually-hidden" id="fallback">Se o vídeo não carregar, abra o episódio direto no Google Drive.</div>
+      </div>
+    </section>
 
-function restartVideo(){
-    const current = player.src;
-    player.src='';
-    setTimeout(()=>player.src=current,50);
-}
+    <footer>Use ← e → para navegar, R para reiniciar, F para tela cheia. Suporte para dispositivos móveis, desktop e TV.</footer>
+  </main>
 
-function nextVideo(){
-    if(select.selectedIndex<select.options.length-1) loadEpisode(select.selectedIndex+1);
-}
+  <script>
+    // Lista de episódios (IDs do Google Drive)
+    const episodes = [
+      '1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU','1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o','1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t',
+      '1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh','1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-','1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1',
+      '1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ','1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4','1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv',
+      '1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k','1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7','11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB',
+      '1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et'
+    ];
 
-function prevVideo(){
-    if(select.selectedIndex>0) loadEpisode(select.selectedIndex-1);
-}
-</script>
+    const player = document.getElementById('player');
+    const select = document.getElementById('episodes');
+    const status = document.getElementById('status');
+    const fallback = document.getElementById('fallback');
 
+    function updateStatus(msg){
+      status.textContent = msg;
+    }
+
+    function buildDriveUrl(id){
+      return `https://drive.google.com/file/d/${id}/preview`;
+    }
+
+    function loadEpisode(index, announce=true){
+      if(index<0) index = episodes.length-1;
+      if(index>=episodes.length) index = 0;
+      select.selectedIndex = index;
+      const url = buildDriveUrl(episodes[index]);
+      player.src = url;
+      if(announce) updateStatus(`Episódio ${index+1} carregado`);
+    }
+
+    // Inicializa com o índice 0
+    loadEpisode(0,false);
+
+    // Eventos do select
+    select.addEventListener('change', ()=>{
+      loadEpisode(select.selectedIndex);
+    });
+
+    // Botões
+    document.getElementById('nextBtn').addEventListener('click', ()=>loadEpisode(select.selectedIndex+1));
+    document.getElementById('prevBtn').addEventListener('click', ()=>loadEpisode(select.selectedIndex-1));
+    document.getElementById('restartBtn').addEventListener('click', ()=>{
+      const current = player.src; player.src=''; setTimeout(()=>player.src=current,80); updateStatus('Reiniciado');
+    });
+
+    document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
+      const el = document.getElementById('playerEmbed');
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if(el.msRequestFullscreen) el.msRequestFullscreen();
+    });
+
+    // Atalhos de teclado
+    window.addEventListener('keydown',(e)=>{
+      if(document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA' || document.activeElement.isContentEditable)) return;
+      if(e.key === 'ArrowRight') loadEpisode(select.selectedIndex+1);
+      if(e.key === 'ArrowLeft') loadEpisode(select.selectedIndex-1);
+      if(e.key.toLowerCase() === 'r'){
+        const current = player.src; player.src=''; setTimeout(()=>player.src=current,80); updateStatus('Reiniciado');
+      }
+      if(e.key.toLowerCase() === 'f'){
+        const el = document.getElementById('playerEmbed');
+        if(el.requestFullscreen) el.requestFullscreen();
+      }
+    });
+
+    // Fallback se iframe não carregar (simples)
+    player.addEventListener('error', ()=>{
+      fallback.classList.remove('visually-hidden');
+      updateStatus('Erro ao carregar o vídeo.');
+    });
+
+    // ========== Partículas no fundo (canvas) ==========
+    (function(){
+      const canvas = document.getElementById('universe');
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = innerWidth;
+      let height = canvas.height = innerHeight;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = width*ratio; canvas.height = height*ratio; canvas.style.width = width+'px'; canvas.style.height = height+'px'; ctx.scale(ratio,ratio);
+
+      let particles = [];
+      const config = {
+        count: Math.round((width*height)/60000)+80,
+        maxSize: 2.8,
+        speed: 0.2,
+        drift: 0.04,
+        hue: 190
+      };
+
+      function rand(min,max){return Math.random()*(max-min)+min}
+
+      function create(){
+        particles = [];
+        for(let i=0;i<config.count;i++){
+          particles.push({
+            x:rand(0,width),
+            y:rand(0,height),
+            vx:rand(-config.speed,config.speed),
+            vy:rand(-config.speed,config.speed),
+            r:rand(0.3,config.maxSize),
+            alpha:rand(0.05,0.9)
+          });
+        }
+      }
+
+      function draw(){
+        ctx.clearRect(0,0,width,height);
+        // suave nebulosa
+        const g = ctx.createLinearGradient(0,0,width,height);
+        g.addColorStop(0,'rgba(5,6,8,0.6)');
+        g.addColorStop(0.5,'rgba(8,12,18,0.55)');
+        g.addColorStop(1,'rgba(6,8,10,0.7)');
+        ctx.fillStyle = g; ctx.fillRect(0,0,width,height);
+
+        // estrelas
+        for(let p of particles){
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(180,${200+Math.round(Math.random()*30)},220,${p.alpha})`;
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fill();
+        }
+
+        // partículas conectadas - leve efeito de fluxo
+        for(let i=0;i<particles.length;i++){
+          const a = particles[i];
+          for(let j=i+1;j<particles.length;j++){
+            const b = particles[j];
+            const dx = a.x-b.x; const dy = a.y-b.y; const d = Math.sqrt(dx*dx+dy*dy);
+            if(d<100){
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(0,255,204,${(0.12*(1-d/100))*Math.min(a.alpha,b.alpha)})`;
+              ctx.lineWidth = 0.6;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function step(){
+        for(let p of particles){
+          p.x += p.vx + Math.sin((p.y+performance.now()*0.0002))*config.drift;
+          p.y += p.vy + Math.cos((p.x+performance.now()*0.0002))*config.drift;
+          if(p.x<0) p.x = width; if(p.x>width) p.x=0;
+          if(p.y<0) p.y = height; if(p.y>height) p.y=0;
+        }
+        draw();
+        requestAnimationFrame(step);
+      }
+
+      // Resposta ao redimensionamento
+      let resizeTimer; window.addEventListener('resize', ()=>{
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(()=>{
+          width = canvas.width = innerWidth; height = canvas.height = innerHeight;
+          canvas.width = width*ratio; canvas.height = height*ratio; canvas.style.width = width+'px'; canvas.style.height = height+'px'; ctx.scale(ratio,ratio);
+          config.count = Math.round((width*height)/60000)+80; create();
+        },120);
+      });
+
+      // Se o usuário prefere reduzir movimento, pausa animação
+      const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(!media.matches){ create(); step(); }
+    })();
+  </script>
 </body>
 </html>
