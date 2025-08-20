@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cosmos - Carl Sagan</title>
+<link rel="shortcut icon" href="imagens/favicon_io2/favicon.ico" type="image/x-icon">
+<style>
+/* Fonte e reset */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+    background: linear-gradient(270deg, #0b0b0b, #1a1a1a, #0b0b0b);
+    background-size: 600% 600%;
+    animation: gradientBG 30s ease infinite;
+}
+
+/* Animação do fundo cósmico */
+@keyframes gradientBG {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.8em;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 20px #00ffcc;
+}
+
+/* Player */
+.video-container {
+    width: 90%;
+    max-width: 960px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(0,255,204,0.6);
+    margin-bottom: 25px;
+    position: relative;
+    background: #000;
+    animation: pulseGlow 2s infinite alternate;
+}
+
+iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: 0;
+    border-radius: 15px;
+}
+
+/* Glow pulsante */
+@keyframes pulseGlow {
+    0%{box-shadow:0 0 40px rgba(0,255,204,0.5);}
+    100%{box-shadow:0 0 60px rgba(0,255,204,0.9);}
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 960px;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+select, button {
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+select {
+    background-color: #222;
+    color: #fff;
+    min-width: 200px;
+}
+
+select:hover {
+    background-color: #333;
+}
+
+button {
+    background-color: #00ffcc;
+    color: #000;
+    box-shadow: 0 0 20px #00ffcc;
+}
+
+button:hover {
+    background-color: #00e6b8;
+    box-shadow: 0 0 35px #00e6b8;
+    transform: translateY(-2px);
+}
+
+.label {
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Responsividade */
+@media (max-width:768px){
+    h1 { font-size: 2.2em; }
+    select, button { font-size: 14px; padding: 10px 14px; }
+}
+@media (max-width:480px){
+    h1 { font-size: 1.8em; }
+    .controls { flex-direction: column; gap: 10px; }
+    select, button { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<h1>🌌 Cosmos - Carl Sagan</h1>
+
+<div class="video-container">
+    <iframe id="player" 
+        src="https://drive.google.com/file/d/1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU/preview" 
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write" 
+        allowfullscreen loading="lazy"></iframe>
+</div>
+
+<div class="controls">
+    <div>
+        <span class="label">Episódio:</span>
+        <select id="episodes">
+            <option value="1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU">Episódio 1</option>
+            <option value="1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o">Episódio 2</option>
+            <option value="1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t">Episódio 3</option>
+            <option value="1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh">Episódio 4</option>
+            <option value="1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-">Episódio 5</option>
+            <option value="1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1">Episódio 6</option>
+            <option value="1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ">Episódio 7</option>
+            <option value="1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4">Episódio 8</option>
+            <option value="1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv">Episódio 9</option>
+            <option value="1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k">Episódio 10</option>
+            <option value="1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7">Episódio 11</option>
+            <option value="11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB">Episódio 12</option>
+            <option value="1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et">Episódio 13</option>
+        </select>
+    </div>
+
+    <div>
+        <button onclick="prevVideo()">⬅ Anterior</button>
+        <button onclick="restartVideo()">🔄 Reiniciar</button>
+        <button onclick="nextVideo()">Próximo ➡</button>
+        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+</div>
+
+<script>
+const player = document.getElementById('player');
+const select = document.getElementById('episodes');
+
+function loadEpisode(index){
+    const option = select.options[index];
+    select.selectedIndex = index;
+    player.src = `https://drive.google.com/file/d/${option.value}/preview`;
+}
+
+// Inicializa episódio 1
+loadEpisode(0);
+
+// Eventos
+select.addEventListener('change', ()=>loadEpisode(select.selectedIndex));
+
+function toggleFullscreen(){
+    if(player.requestFullscreen) player.requestFullscreen();
+    else if(player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+    else if(player.msRequestFullscreen) player.msRequestFullscreen();
+}
+
+function restartVideo(){
+    const current = player.src;
+    player.src='';
+    setTimeout(()=>player.src=current,50);
+}
+
+function nextVideo(){
+    if(select.selectedIndex<select.options.length-1) loadEpisode(select.selectedIndex+1);
+}
+
+function prevVideo(){
+    if(select.selectedIndex>0) loadEpisode(select.selectedIndex-1);
+}
+</script>
+
+</body>
+</html>

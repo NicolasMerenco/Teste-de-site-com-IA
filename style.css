@@ -141,6 +141,11 @@ body {
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   border: 2px solid #922b21;
 }
+.btn-projeto12 {
+  background: linear-gradient(135deg, #34426d 0%, #311ea1 100%);
+  border: 2px solid #052a7a;
+}
+
 
 .btn:hover {
   transform: translateY(-4px);
