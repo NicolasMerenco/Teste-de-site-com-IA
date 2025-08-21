@@ -2,324 +2,163 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
   <title>Cosmos — Carl Sagan</title>
   <link rel="shortcut icon" href="imagens/favicon_io2/favicon.ico" type="image/x-icon">
-  <meta name="description" content="Coleção de episódios — Cosmos. Player responsivo com navegação acessível e fundo com partículas cósmicas.">
+  <meta name="description" content="Coleção de episódios — player responsivo, acessível e otimizado para publicação.">
   <style>
     :root{
-      --bg-1:#07070b;
-      --bg-2:#0f1720;
-      --accent:#00ffcc;
-      --card-bg:rgba(10,12,15,0.6);
-      --glass: rgba(255,255,255,0.03);
-      --text:#FFFFFF;
-      --muted:rgba(255,255,255,0.7);
-      --radius:14px;
-      --max-width:1080px;
+      --bg-1:#020207; --bg-2:#081018; --accent:#00ffcc; --muted:rgba(255,255,255,0.75);
+      --card-bg:rgba(8,10,14,0.55); --ui-bg:rgba(0,0,0,0.45); --radius:12px; --max-width:1200px;
+      --text:#ffffff; --spinner-size:56px; --particle-color:180,220,255;
     }
+    :root[data-theme='light']{ --bg-1:#f6f7fb; --bg-2:#eef3fb; --accent:#006b5f; --text:#051018; --card-bg:rgba(255,255,255,0.9); --ui-bg:rgba(255,255,255,0.9); --particle-color:40,120,140 }
 
-    /* Reset mínimo */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color:var(--text);
-      background:linear-gradient(180deg,var(--bg-1),var(--bg-2));
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      overflow-x:hidden;
-    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family: Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;color:var(--text);background:linear-gradient(180deg,var(--bg-1),var(--bg-2));-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px;}
 
-    /* Skip link para acessibilidade */
     .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-    .skip-link:focus{position:static;width:auto;height:auto;margin:8px;z-index:999;background:#fff;color:#000;padding:8px;border-radius:6px}
+    .skip-link:focus{position:static;width:auto;height:auto;margin:12px;z-index:999;background:#fff;color:#000;padding:8px;border-radius:6px}
 
-    header{display:flex;align-items:center;gap:16px;padding:22px;justify-content:center}
-    h1{margin:0;font-size:2.4rem;letter-spacing:0.6px;text-align:center;text-shadow:0 0 18px rgba(0,255,204,0.08);}
-    .subtitle{font-size:0.95rem;color:var(--muted);text-align:center;margin-top:6px}
+    header{width:100%;max-width:var(--max-width);display:flex;align-items:center;justify-content:space-between;padding:10px 6px;gap:10px}
+    h1{font-size:clamp(1.2rem,3.2vw,2.2rem);margin:0}
 
-    main{display:flex;flex-direction:column;align-items:center;padding:18px 18px 64px}
+    .header-controls{display:flex;gap:8px;align-items:center}
+    .icon-btn{background:var(--ui-bg);border-radius:10px;padding:8px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+    .range{width:140px}
 
-    /* Canvas de partículas cobre o fundo e fica atrás de todo o conteúdo */
-    #universe{
-      position:fixed;inset:0;z-index:0;pointer-events:none;display:block;opacity:0.95
-    }
+    main{width:100%;max-width:var(--max-width);z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px}
+    #universe{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-    .stage{position:relative;z-index:2;width:100%;max-width:var(--max-width);display:flex;flex-direction:column;align-items:center;gap:20px}
+    .card{width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;backdrop-filter:blur(6px);box-shadow:0 8px 40px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.03);position:relative}
 
-    .card{
-      width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);padding:16px;backdrop-filter:blur(6px);box-shadow:0 8px 40px rgba(2,6,23,0.6);
-      border:1px solid rgba(255,255,255,0.03)
-    }
+    .player-wrap{display:flex;justify-content:center;width:100%}
+    .video-container{width:100%;max-width:1000px;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative}
+    .player-embed{position:relative;width:100%;height:0;padding-bottom:56.25%}
+    .player-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 
-    /* Video container - responsivo e acessível */
-    .video-container{border-radius:12px;overflow:hidden;background:#000;box-shadow:0 0 60px rgba(0,255,204,0.06)}
-    .player-embed{width:100%;height:0;padding-bottom:56.25%;position:relative}
-    .player-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,0.28),rgba(0,0,0,0.4));backdrop-filter:blur(2px)}
+    .spinner{width:var(--spinner-size);height:var(--spinner-size);border-radius:50%;border:6px solid rgba(255,255,255,0.08);border-top-color:var(--accent);animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .controls-row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
-    .controls-left{display:flex;align-items:center;gap:12px}
-    .controls-right{display:flex;align-items:center;gap:8px}
+    .controls{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+    .controls-left{display:flex;gap:8px;align-items:center}
+    select{appearance:none;padding:10px 12px;border-radius:10px;border:0;background:var(--card-bg);color:inherit;font-size:1rem}
+    button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#00e6b8);color:#001;font-weight:700;cursor:pointer}
 
-    select,button{font-size:1rem;padding:10px 14px;border-radius:10px;border:0;background:var(--card-bg);color:var(--text);cursor:pointer}
-    button{background:linear-gradient(90deg,var(--accent) 0%, #00e6b8 100%);color:#001;box-shadow:0 8px 30px rgba(0,255,204,0.08);font-weight:600}
-    button:focus,select:focus{outline:3px solid rgba(0,255,204,0.12)}
+    .fallback-panel{display:none;padding:12px;border-radius:10px;background:var(--ui-bg);color:var(--muted);text-align:center;margin-top:12px}
+    .fallback-panel.visible{display:block}
 
-    .label{font-weight:600;margin-right:6px}
+    @media (max-width:600px){.controls{flex-direction:column;align-items:stretch}select,button{padding:14px;font-size:1rem;border-radius:12px}.player-embed{padding-bottom:56.25%}}
+    @media (min-width:1400px){.video-container{max-width:1280px}}
 
-    /* Responsividade ampliada (TV / grandes telas) */
-    @media (min-width:1200px){h1{font-size:3.4rem}.player-embed{padding-bottom:56.25%}.stage{gap:26px}}
-
-    @media (max-width:768px){h1{font-size:1.8rem}.controls-row{flex-direction:column;align-items:stretch}.controls-right{justify-content:space-between}}
-
-    /* Acessibilidade visual */
     .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
-
-    /* Mensagens de erro/fallback */
-    .fallback{padding:18px;border-radius:10px;background:rgba(255,255,255,0.03);color:var(--muted);text-align:center}
-
-    /* Prefer reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      *{animation:none!important;transition:none!important}
-    }
-
-    footer{margin-top:24px;color:var(--muted);font-size:0.9rem;text-align:center}
+    footer{width:100%;max-width:var(--max-width);text-align:center;color:var(--muted);font-size:0.9rem;padding:8px}
+    @media (prefers-reduced-motion: reduce){.spinner{animation:none}}
   </style>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+  <a href="#playerEmbed" class="skip-link">Pular para o player</a>
   <canvas id="universe" aria-hidden="true"></canvas>
-  <header role="banner">
-    <div>
-      <h1>🌌 Cosmos — Carl Sagan</h1>
-      <div class="subtitle">Coleção de episódios — player acessível e responsivo</div>
+
+  <header>
+    <h1>🌌 Cosmos — Carl Sagan</h1>
+    <div class="header-controls">
+      <button id="themeToggle" class="icon-btn" aria-pressed="false" title="Alternar tema" aria-label="Alternar tema">Tema</button>
+      <input id="particleRange" class="range" type="range" min="0" max="100" value="60" aria-label="Intensidade das partículas">
     </div>
   </header>
 
-  <main id="main-content" class="stage" role="main">
-
+  <main id="main" role="main">
     <section class="card" aria-labelledby="player-title">
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
-          <div style="display:flex;flex-direction:column">
-            <h2 id="player-title" style="margin:0;font-size:1.2rem">Assistir Episódios</h2>
-            <div id="player-desc" class="visually-hidden">Selecione um episódio no menu e use as teclas ← → para navegar. Pressione R para reiniciar e F para tela cheia.</div>
-          </div>
+      <h2 id="player-title" style="margin:0 0 12px 0;font-size:1.05rem">Episódios</h2>
 
-          <div style="display:flex;gap:12px;align-items:center">
-            <label for="episodes" class="label" aria-hidden="true">Episódio</label>
-            <select id="episodes" aria-label="Escolha de episódio">
-              <option value="1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU">Episódio 1</option>
-              <option value="1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o">Episódio 2</option>
-              <option value="1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t">Episódio 3</option>
-              <option value="1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh">Episódio 4</option>
-              <option value="1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-">Episódio 5</option>
-              <option value="1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1">Episódio 6</option>
-              <option value="1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ">Episódio 7</option>
-              <option value="1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4">Episódio 8</option>
-              <option value="1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv">Episódio 9</option>
-              <option value="1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k">Episódio 10</option>
-              <option value="1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7">Episódio 11</option>
-              <option value="11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB">Episódio 12</option>
-              <option value="1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et">Episódio 13</option>
-            </select>
-          </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <label for="episodes" class="visually-hidden">Escolha o episódio</label>
+        <select id="episodes" aria-label="Escolha o episódio" style="min-width:160px"></select>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="prevBtn" aria-label="episódio anterior">⬅</button>
+          <button id="restartBtn" aria-label="reiniciar episódio">🔄</button>
+          <button id="nextBtn" aria-label="próximo episódio">➡</button>
+          <button id="fullscreenBtn" aria-label="tela cheia">⛶</button>
         </div>
-
-        <div class="video-container">
-          <div class="player-embed" id="playerEmbed" role="region" aria-label="Player de vídeo">
-            <iframe id="player" src="about:blank" title="Player de vídeo - Cosmos" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy"></iframe>
-          </div>
-        </div>
-
-        <div class="controls-row" role="toolbar" aria-label="Controles do player">
-          <div class="controls-left">
-            <button id="prevBtn" type="button" aria-label="Episódio anterior">⬅ Anterior</button>
-            <button id="restartBtn" type="button" aria-label="Reiniciar episódio">🔄 Reiniciar</button>
-            <button id="nextBtn" type="button" aria-label="Próximo episódio">Próximo ➡</button>
-            <button id="fullscreenBtn" type="button" aria-label="Alternar tela cheia">⛶ Fullscreen</button>
-          </div>
-          <div class="controls-right">
-            <div id="status" aria-live="polite" style="font-size:0.95rem;color:var(--muted)"></div>
-          </div>
-        </div>
-
-        <div class="fallback visually-hidden" id="fallback">Se o vídeo não carregar, abra o episódio direto no Google Drive.</div>
       </div>
-    </section>
 
-    <footer>Use ← e → para navegar, R para reiniciar, F para tela cheia. Suporte para dispositivos móveis, desktop e TV.</footer>
+      <div class="player-wrap">
+        <div class="video-container" role="group" aria-label="player de vídeo">
+          <div class="player-embed" id="playerEmbed">
+            <iframe id="player" src="about:blank" title="Player de vídeo - Cosmos" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy"></iframe>
+            <div class="overlay" id="overlay"><div class="spinner" role="status" aria-live="polite" aria-label="Carregando vídeo"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fallback" class="fallback-panel">Vídeo não carregou. <a id="openDrive" href="#" target="_blank" rel="noopener">Abrir no Google Drive</a></div>
+
+      <div role="status" aria-live="polite" style="margin-top:10px;color:var(--muted)" id="status">&nbsp;</div>
+    </section>
   </main>
 
   <script>
-    // Lista de episódios (IDs do Google Drive)
-    const episodes = [
-      '1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU','1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o','1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t',
-      '1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh','1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-','1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1',
-      '1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ','1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4','1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv',
-      '1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k','1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7','11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB',
-      '1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et'
-    ];
+    const episodeIds = ['1ewQ-1NTh93tL9yOWF0iDUUcMf2lSM_bU','1ByYI5V-F-a3hwlpHsG14MaZPW15GP47o','1qq2ZQR8jIAarB2N7BUsApVw-KL11AB-t','1gqsPrE2C4G48ErxV-wuswYNRBKGx_LBh','1vGG7chXX2UV34FM1ZfLFjCHOCqj5Yqw-','1yyRFOlKf_FuwhRUnRIOwln6l1tgHvmi1','1b0elQDX0XkpiuOHXp67kmmG5XiZ7LkDQ','1wwULz-VoB8hCzzJK5d9lMIRWSak9CHJ4','1lli-IcZ2Hzm1sjZRr-TPYo00CyvE14fv','1aHcTN8JC-vv0YDzuiLkRDoPOpVxO3t_k','1iVBcoO8RUp6yLqwgoatxt5YvJ3a0jA_7','11I0AcjCdMnMk6cR7VOzbxTB-9TCwJ6fB','1XDeu2197Z1tv_R9lpkWS-TABbnyC20Et'];
 
     const player = document.getElementById('player');
     const select = document.getElementById('episodes');
     const status = document.getElementById('status');
+    const overlay = document.getElementById('overlay');
     const fallback = document.getElementById('fallback');
+    const openDrive = document.getElementById('openDrive');
 
-    function updateStatus(msg){
-      status.textContent = msg;
-    }
+    function populateSelect(){ episodeIds.forEach((id,i)=>{ const opt=document.createElement('option'); opt.value=id; opt.textContent=`Episódio ${i+1}`; select.appendChild(opt); }); }
+    populateSelect();
 
-    function buildDriveUrl(id){
-      return `https://drive.google.com/file/d/${id}/preview`;
-    }
+    function buildDriveUrl(id){return `https://drive.google.com/file/d/${id}/preview`}
+    function updateStatus(msg){ status.textContent=msg }
 
-    function loadEpisode(index, announce=true){
-      if(index<0) index = episodes.length-1;
-      if(index>=episodes.length) index = 0;
-      select.selectedIndex = index;
-      const url = buildDriveUrl(episodes[index]);
-      player.src = url;
-      if(announce) updateStatus(`Episódio ${index+1} carregado`);
-    }
+    function loadEpisode(index,announce=true){ if(index<0) index=episodeIds.length-1; if(index>=episodeIds.length) index=0; select.selectedIndex=index; const url=buildDriveUrl(episodeIds[index]); overlay.style.display='flex'; fallback.classList.remove('visible'); player.src=url; openDrive.href=`https://drive.google.com/file/d/${episodeIds[index]}/view`; if(announce) updateStatus(`Episódio ${index+1} carregado`); }
 
-    // Inicializa com o índice 0
     loadEpisode(0,false);
 
-    // Eventos do select
-    select.addEventListener('change', ()=>{
-      loadEpisode(select.selectedIndex);
-    });
+    let loadTimeout;
+    player.addEventListener('load', ()=>{ clearTimeout(loadTimeout); overlay.style.display='none'; fallback.classList.remove('visible'); updateStatus('Pronto'); });
+    function startLoadTimeout(){ clearTimeout(loadTimeout); loadTimeout=setTimeout(()=>{ overlay.style.display='none'; fallback.classList.add('visible'); updateStatus('Erro ao carregar - abrir no Drive'); },6000); }
 
-    // Botões
-    document.getElementById('nextBtn').addEventListener('click', ()=>loadEpisode(select.selectedIndex+1));
-    document.getElementById('prevBtn').addEventListener('click', ()=>loadEpisode(select.selectedIndex-1));
-    document.getElementById('restartBtn').addEventListener('click', ()=>{
-      const current = player.src; player.src=''; setTimeout(()=>player.src=current,80); updateStatus('Reiniciado');
-    });
+    select.addEventListener('change', ()=>{ loadEpisode(select.selectedIndex); startLoadTimeout(); });
+    document.getElementById('nextBtn').addEventListener('click', ()=>{ loadEpisode(select.selectedIndex+1); startLoadTimeout(); });
+    document.getElementById('prevBtn').addEventListener('click', ()=>{ loadEpisode(select.selectedIndex-1); startLoadTimeout(); });
+    document.getElementById('restartBtn').addEventListener('click', ()=>{ const cur=player.src; player.src=''; overlay.style.display='flex'; setTimeout(()=>player.src=cur,120); startLoadTimeout(); updateStatus('Reiniciado'); });
+    document.getElementById('fullscreenBtn').addEventListener('click', ()=>{ const el=document.getElementById('playerEmbed'); if(el.requestFullscreen) el.requestFullscreen(); else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else if(el.msRequestFullscreen) el.msRequestFullscreen(); });
 
-    document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
-      const el = document.getElementById('playerEmbed');
-      if(el.requestFullscreen) el.requestFullscreen();
-      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-      else if(el.msRequestFullscreen) el.msRequestFullscreen();
-    });
+    window.addEventListener('keydown',(e)=>{ if(document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA' || document.activeElement.isContentEditable)) return; if(e.key==='ArrowRight'){ loadEpisode(select.selectedIndex+1); startLoadTimeout(); } if(e.key==='ArrowLeft'){ loadEpisode(select.selectedIndex-1); startLoadTimeout(); } if(e.key.toLowerCase()==='f'){ const el=document.getElementById('playerEmbed'); if(el.requestFullscreen) el.requestFullscreen(); } });
 
-    // Atalhos de teclado
-    window.addEventListener('keydown',(e)=>{
-      if(document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA' || document.activeElement.isContentEditable)) return;
-      if(e.key === 'ArrowRight') loadEpisode(select.selectedIndex+1);
-      if(e.key === 'ArrowLeft') loadEpisode(select.selectedIndex-1);
-      if(e.key.toLowerCase() === 'r'){
-        const current = player.src; player.src=''; setTimeout(()=>player.src=current,80); updateStatus('Reiniciado');
+    openDrive.addEventListener('click', ()=>{ updateStatus('Abrindo no Google Drive...'); });
+    startLoadTimeout();
+
+    // theme toggle: full theme
+    const themeToggle=document.getElementById('themeToggle');
+    function setTheme(t){ if(t==='light'){ document.documentElement.setAttribute('data-theme','light'); themeToggle.setAttribute('aria-pressed','true'); } else { document.documentElement.removeAttribute('data-theme'); themeToggle.setAttribute('aria-pressed','false'); } }
+    const saved=localStorage.getItem('site-theme'); if(saved) setTheme(saved);
+    themeToggle.addEventListener('click', ()=>{ const isLight=document.documentElement.getAttribute('data-theme')==='light'; setTheme(isLight? 'dark':'light'); localStorage.setItem('site-theme', isLight? 'dark':'light'); });
+
+    // particles - improved visuals: twinkle + lighter connections + responsive count
+    (function(){ const canvas=document.getElementById('universe'); if(!canvas) return; const ctx=canvas.getContext('2d'); let W=innerWidth,H=innerHeight,DPR=window.devicePixelRatio||1; function resize(){W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);} resize();
+      let baseCount=Math.round((W*H)/110000)+40; if(W<600) baseCount=Math.round((W*H)/160000)+12; const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches; let particles=[]; function rand(a,b){return Math.random()*(b-a)+a}
+      function init(n){particles.length=0; for(let i=0;i<n;i++){particles.push({x:rand(0,W),y:rand(0,H),r:rand(0.4,2.4),vx:rand(-0.12,0.12),vy:rand(-0.12,0.12),a:rand(0.05,0.95),tw:Math.random()*1.2})}}
+      init(baseCount);
+      const range=document.getElementById('particleRange'); if(range){ range.addEventListener('input',(e)=>{ const v=Number(e.target.value); const target=Math.round((W*H)/110000*(v/60))+6; init(Math.max(0,Math.min(1200,target))); }); }
+      function draw(){ ctx.clearRect(0,0,W,H); const g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,'rgba(2,4,8,0.58)'); g.addColorStop(1,'rgba(6,8,12,0.6)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+        // stars with twinkle
+        for(const p of particles){ const hue = getComputedStyle(document.documentElement).getPropertyValue('--particle-color')||'180,220,255'; const alpha = p.a * (0.6 + 0.4*Math.sin(performance.now()*0.002 + p.tw)); ctx.beginPath(); ctx.fillStyle=`rgba(${hue.trim()},${Math.max(0.05,alpha)})`; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }
+        // faint connections but only on large screens
+        if(W>600){ for(let i=0;i<particles.length;i++){ const a=particles[i]; for(let j=i+1;j<particles.length;j++){ const b=particles[j]; const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy); if(d<80){ ctx.beginPath(); ctx.strokeStyle=`rgba(${getComputedStyle(document.documentElement).getPropertyValue('--particle-color')||'180,220,255'},${(0.06*(1-d/80))*Math.min(a.a,b.a)})`; ctx.lineWidth=0.45; ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } } } }
       }
-      if(e.key.toLowerCase() === 'f'){
-        const el = document.getElementById('playerEmbed');
-        if(el.requestFullscreen) el.requestFullscreen();
-      }
-    });
-
-    // Fallback se iframe não carregar (simples)
-    player.addEventListener('error', ()=>{
-      fallback.classList.remove('visually-hidden');
-      updateStatus('Erro ao carregar o vídeo.');
-    });
-
-    // ========== Partículas no fundo (canvas) ==========
-    (function(){
-      const canvas = document.getElementById('universe');
-      const ctx = canvas.getContext('2d');
-      let width = canvas.width = innerWidth;
-      let height = canvas.height = innerHeight;
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = width*ratio; canvas.height = height*ratio; canvas.style.width = width+'px'; canvas.style.height = height+'px'; ctx.scale(ratio,ratio);
-
-      let particles = [];
-      const config = {
-        count: Math.round((width*height)/60000)+80,
-        maxSize: 2.8,
-        speed: 0.2,
-        drift: 0.04,
-        hue: 190
-      };
-
-      function rand(min,max){return Math.random()*(max-min)+min}
-
-      function create(){
-        particles = [];
-        for(let i=0;i<config.count;i++){
-          particles.push({
-            x:rand(0,width),
-            y:rand(0,height),
-            vx:rand(-config.speed,config.speed),
-            vy:rand(-config.speed,config.speed),
-            r:rand(0.3,config.maxSize),
-            alpha:rand(0.05,0.9)
-          });
-        }
-      }
-
-      function draw(){
-        ctx.clearRect(0,0,width,height);
-        // suave nebulosa
-        const g = ctx.createLinearGradient(0,0,width,height);
-        g.addColorStop(0,'rgba(5,6,8,0.6)');
-        g.addColorStop(0.5,'rgba(8,12,18,0.55)');
-        g.addColorStop(1,'rgba(6,8,10,0.7)');
-        ctx.fillStyle = g; ctx.fillRect(0,0,width,height);
-
-        // estrelas
-        for(let p of particles){
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(180,${200+Math.round(Math.random()*30)},220,${p.alpha})`;
-          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fill();
-        }
-
-        // partículas conectadas - leve efeito de fluxo
-        for(let i=0;i<particles.length;i++){
-          const a = particles[i];
-          for(let j=i+1;j<particles.length;j++){
-            const b = particles[j];
-            const dx = a.x-b.x; const dy = a.y-b.y; const d = Math.sqrt(dx*dx+dy*dy);
-            if(d<100){
-              ctx.beginPath();
-              ctx.strokeStyle = `rgba(0,255,204,${(0.12*(1-d/100))*Math.min(a.alpha,b.alpha)})`;
-              ctx.lineWidth = 0.6;
-              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-            }
-          }
-        }
-      }
-
-      function step(){
-        for(let p of particles){
-          p.x += p.vx + Math.sin((p.y+performance.now()*0.0002))*config.drift;
-          p.y += p.vy + Math.cos((p.x+performance.now()*0.0002))*config.drift;
-          if(p.x<0) p.x = width; if(p.x>width) p.x=0;
-          if(p.y<0) p.y = height; if(p.y>height) p.y=0;
-        }
-        draw();
-        requestAnimationFrame(step);
-      }
-
-      // Resposta ao redimensionamento
-      let resizeTimer; window.addEventListener('resize', ()=>{
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(()=>{
-          width = canvas.width = innerWidth; height = canvas.height = innerHeight;
-          canvas.width = width*ratio; canvas.height = height*ratio; canvas.style.width = width+'px'; canvas.style.height = height+'px'; ctx.scale(ratio,ratio);
-          config.count = Math.round((width*height)/60000)+80; create();
-        },120);
-      });
-
-      // Se o usuário prefere reduzir movimento, pausa animação
-      const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if(!media.matches){ create(); step(); }
+      function step(){ for(const p of particles){ p.x += p.vx + Math.sin((p.y+performance.now()*0.0003))*0.018; p.y += p.vy + Math.cos((p.x+performance.now()*0.0003))*0.018; if(p.x<0) p.x=W; if(p.x>W) p.x=0; if(p.y<0) p.y=H; if(p.y>H) p.y=0 } draw(); requestAnimationFrame(step); }
+      window.addEventListener('resize',()=>{ resize(); baseCount=Math.round((innerWidth*innerHeight)/110000)+40; if(innerWidth<600) baseCount=Math.round((innerWidth*innerHeight)/160000)+12; init(baseCount); });
+      if(!reduced) step(); else ctx.clearRect(0,0,W,H);
     })();
+
   </script>
 </body>
 </html>
